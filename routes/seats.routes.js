@@ -18,6 +18,15 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
   const { day, seat, client, email } = req.body;
+
+  // Sprawdź, czy dane miejsce na koncercie jest już zarezerwowane
+  const isSeatTaken = db.seats.some(item => item.day === day && item.seat === seat);
+
+  if (isSeatTaken) {
+    // Jeśli miejsce jest już zajęte, zwróć błąd
+    return res.status(400).json({ message: 'The slot is already taken...' });
+  }
+
   const newSeat = { id: db.seats.length + 1, day, seat, client, email };
   db.seats.push(newSeat);
   res.json({ message: 'OK' });
