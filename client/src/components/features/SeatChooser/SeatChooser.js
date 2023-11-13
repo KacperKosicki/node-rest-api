@@ -1,65 +1,47 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Progress, Alert } from 'reactstrap';
-import { getSeats, loadSeatsRequest, getRequests } from '../../../redux/seatsRedux';
 import io from 'socket.io-client';
+import { loadSeatsRequest, getSeats, getRequests } from '../../../redux/seatsRedux';
 import './SeatChooser.scss';
-
-const useInterval = (callback, delay) => {
-  const savedCallback = useRef();
-
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  useEffect(() => {
-    const tick = () => savedCallback.current();
-    if (delay !== null) {
-      const id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-};
 
 const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
   const dispatch = useDispatch();
   const seats = useSelector(getSeats);
   const requests = useSelector(getRequests);
-
   const [freeSeatsCount, setFreeSeatsCount] = useState(0);
 
-  const isTaken = (seatId) => {
-    return seats.some((item) => item.seat === seatId && item.day === chosenDay);
-  };
-
-  const updateFreeSeatsCount = () => {
-    const totalSeats = 50; // Zakładamy, że masz 50 miejsc
-    const takenSeatsCount = seats.filter((item) => item.day === chosenDay).length;
-    const freeSeats = totalSeats - takenSeatsCount;
-    setFreeSeatsCount(freeSeats);
-  };
-
-  const fetchSeatsData = async () => {
-    await dispatch(loadSeatsRequest());
-    updateFreeSeatsCount();
-  };
+  useEffect(() => {
+    const socket = io(process.env.NODE_ENV === 'production' ? '' : 'ws://localhost:8000', { transports: ['websocket'] });
+  
+    socket.on('seatsUpdated', () => {
+      dispatch(loadSeatsRequest());
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(loadSeatsRequest());
   }, [dispatch]);
 
   useEffect(() => {
-    if (chosenSeat) {
-      fetchSeatsData();
-    }
-  }, [chosenSeat]);
-
-  useInterval(fetchSeatsData, 120000);
+    const totalSeats = 50;
+    const takenSeatsCount = seats.filter((item) => item.day === chosenDay).length;
+    const freeSeats = totalSeats - takenSeatsCount;
+    setFreeSeatsCount(freeSeats);
+  }, [seats, chosenDay]);
 
   const prepareSeat = (seatId) => {
     if (seatId === chosenSeat) return <Button key={seatId} className="seats__seat" color="primary">{seatId}</Button>;
     else if (isTaken(seatId)) return <Button key={seatId} className="seats__seat" disabled color="secondary">{seatId}</Button>;
     else return <Button key={seatId} color="primary" className="seats__seat" outline onClick={(e) => updateSeat(e, seatId)}>{seatId}</Button>;
+  };
+
+  const isTaken = (seatId) => {
+    return seats.some((item) => item.seat === seatId && item.day === chosenDay);
   };
 
   return (
