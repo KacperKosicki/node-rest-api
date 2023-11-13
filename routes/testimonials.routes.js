@@ -7,22 +7,22 @@ router.get('/', (req, res) => {
   res.json(db.testimonials);
 });
 
+router.get('/random', (req, res) => {
+  if (db.testimonials.length === 0) {
+    res.status(404).json({ message: 'Not found...1' });
+  } else {
+    const randomIndex = Math.floor(Math.random() * db.testimonials.length);
+    const randomTestimonial = db.testimonials[randomIndex];
+    res.json(randomTestimonial);
+  }
+});
+
 router.get('/:id', (req, res) => {
   const testimonial = db.testimonials.find(item => item.id === parseInt(req.params.id));
   if (testimonial) {
     res.json(testimonial);
   } else {
     res.status(404).json({ message: 'Not found...' });
-  }
-});
-
-router.get('/random', (req, res) => {
-  if (db.testimonials.length === 0) {
-    res.status(404).json({ message: 'Not found...' });
-  } else {
-    const randomIndex = Math.floor(Math.random() * db.testimonials.length);
-    const randomTestimonial = db.testimonials[randomIndex];
-    res.json(randomTestimonial);
   }
 });
 
