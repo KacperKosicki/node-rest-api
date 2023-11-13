@@ -1,4 +1,3 @@
-// seats.routes.js
 const express = require('express');
 const router = express.Router();
 const db = require('./../db');
@@ -19,16 +18,16 @@ router.get('/:id', (req, res) => {
 router.post('/', (req, res) => {
   const { day, seat, client, email } = req.body;
 
-  // Sprawdź, czy dane miejsce na koncercie jest już zarezerwowane
   const isSeatTaken = db.seats.some(item => item.day === day && item.seat === seat);
 
   if (isSeatTaken) {
-    // Jeśli miejsce jest już zajęte, zwróć błąd
     return res.status(400).json({ message: 'The slot is already taken...' });
   }
 
   const newSeat = { id: db.seats.length + 1, day, seat, client, email };
   db.seats.push(newSeat);
+  req.io.emit('seatsUpdated', db.seats);
+
   res.json({ message: 'OK' });
 });
 

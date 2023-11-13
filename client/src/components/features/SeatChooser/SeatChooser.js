@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Progress, Alert } from 'reactstrap';
 import { getSeats, loadSeatsRequest, getRequests } from '../../../redux/seatsRedux';
+import io from 'socket.io-client';
 import './SeatChooser.scss';
 
 const useInterval = (callback, delay) => {
@@ -25,12 +26,22 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
   const seats = useSelector(getSeats);
   const requests = useSelector(getRequests);
 
+  const [freeSeatsCount, setFreeSeatsCount] = useState(0);
+
   const isTaken = (seatId) => {
     return seats.some((item) => item.seat === seatId && item.day === chosenDay);
   };
 
+  const updateFreeSeatsCount = () => {
+    const totalSeats = 50; // Zakładamy, że masz 50 miejsc
+    const takenSeatsCount = seats.filter((item) => item.day === chosenDay).length;
+    const freeSeats = totalSeats - takenSeatsCount;
+    setFreeSeatsCount(freeSeats);
+  };
+
   const fetchSeatsData = async () => {
     await dispatch(loadSeatsRequest());
+    updateFreeSeatsCount();
   };
 
   useEffect(() => {
@@ -54,6 +65,7 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
   return (
     <div>
       <h3>Pick a seat</h3>
+      <p>Free seats: {freeSeatsCount}/50</p>
       <div className="mb-4">
         <small id="pickHelp" className="form-text text-muted ms-2"><Button color="secondary" /> – seat is already taken</small>
         <small id="pickHelpTwo" className="form-text text-muted ms-2"><Button outline color="primary" /> – it's empty</small>
