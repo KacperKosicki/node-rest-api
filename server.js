@@ -3,6 +3,9 @@ const cors = require('cors');
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
+const mongoose = require('mongoose'); // Dodaj import Mongoose
+
+// routes
 const testimonialsRoutes = require('./routes/testimonials.routes');
 const concertsRoutes = require('./routes/concerts.routes');
 const seatsRoutes = require('./routes/seats.routes');
@@ -12,6 +15,18 @@ const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(cors());
+
+// Połączenie z bazą danych
+mongoose.connect('mongodb://localhost:27017/NewWaveDB', {
+  useNewUrlParser: true,
+});
+
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Connection error:'));
+db.once('open', () => {
+  console.log('Connected to the database');
+  // Połączenie z bazą danych - tutaj możesz umieścić dodatkowe konfiguracje związane z bazą danych, jeśli są potrzebne
+});
 
 // Stworzenie serwera HTTP
 const server = http.createServer(app);
@@ -24,9 +39,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/testimonials', testimonialsRoutes);
-app.use('/api/concerts', concertsRoutes);
-app.use('/api/seats', seatsRoutes);
+app.use('/api', testimonialsRoutes);
+app.use('/api', concertsRoutes);
+app.use('/api', seatsRoutes);
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 
