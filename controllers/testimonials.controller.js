@@ -26,7 +26,7 @@ exports.getRandomTestimonial = async (req, res) => {
 
 exports.getTestimonialById = async (req, res) => {
   try {
-    const testimonial = await Testimonial.findById(req.params.id);
+    const testimonial = await Testimonial.findOne({ id: parseInt(req.params.id) });
     if (testimonial) {
       res.json(testimonial);
     } else {

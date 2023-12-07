@@ -4,6 +4,7 @@ const router = express.Router();
 const concertsController = require('../controllers/concerts.controller');
 
 router.get('/concerts', concertsController.getAllConcerts);
+router.get('/concerts/random', concertsController.getRandomConcert);
 router.get('/concerts/:id', concertsController.getConcertById);
 router.post('/concerts', concertsController.createConcert);
 router.put('/concerts/:id', concertsController.updateConcert);

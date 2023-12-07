@@ -9,9 +9,24 @@ exports.getAllSeats = async (req, res) => {
   }
 };
 
+exports.getRandomSeat = async (req, res) => {
+  try {
+    const count = await Seat.countDocuments();
+    if (count === 0) {
+      res.status(404).json({ message: 'Not found...' });
+    } else {
+      const randomIndex = Math.floor(Math.random() * count);
+      const randomSeat = await Seat.findOne().skip(randomIndex);
+      res.json(randomSeat);
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getSeatById = async (req, res) => {
   try {
-    const seat = await Seat.findById( req.params.id );
+    const seat = await Seat.findOne({ id: parseInt(req.params.id) });
     if (seat) {
       res.json(seat);
     } else {

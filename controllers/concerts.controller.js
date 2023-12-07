@@ -9,9 +9,24 @@ exports.getAllConcerts = async (req, res) => {
   }
 };
 
+exports.getRandomConcert = async (req, res) => {
+  try {
+    const count = await Concert.countDocuments();
+    if (count === 0) {
+      res.status(404).json({ message: 'Not found...' });
+    } else {
+      const randomIndex = Math.floor(Math.random() * count);
+      const randomConcert = await Concert.findOne().skip(randomIndex);
+      res.json(randomConcert);
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getConcertById = async (req, res) => {
   try {
-    const concert = await Concert.findById(req.params.id);
+    const concert = await Concert.findOne({ id: parseInt(req.params.id) });
     if (concert) {
       res.json(concert);
     } else {
