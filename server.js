@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 // Połączenie z bazą danych
-mongoose.connect('mongodb://localhost:27017/NewWaveDB', {
+mongoose.connect('mongodb+srv://kosickikacper1:1OaQvJk7zFG57Nfm@cluster0.b2vomcn.mongodb.net/NewWaveDB?retryWrites=true&w=majority', {
   useNewUrlParser: true,
 });
 
