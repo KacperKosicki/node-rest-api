@@ -4,6 +4,7 @@ const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
 const mongoose = require('mongoose'); // Dodaj import Mongoose
+const helmet = require('helmet');
 
 // routes
 const testimonialsRoutes = require('./routes/testimonials.routes');
@@ -42,6 +43,8 @@ app.use((req, res, next) => {
 app.use('/api', testimonialsRoutes);
 app.use('/api', concertsRoutes);
 app.use('/api', seatsRoutes);
+
+app.use(helmet());
 
 app.use(express.static(path.join(__dirname, '/client/build')));
 

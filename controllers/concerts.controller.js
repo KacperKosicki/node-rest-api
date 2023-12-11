@@ -39,7 +39,6 @@ exports.getConcertById = async (req, res) => {
 
 exports.createConcert = async (req, res) => {
   const concert = new Concert(req.body);
-
   try {
     const newConcert = await concert.save();
     res.status(201).json(newConcert);

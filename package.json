@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "mongo-sanitize": "^1.1.0",
+    "helmet": "3.21.1",
+    "mongo-sanitize": "1.0.1",
     "mongoose": "7.4.3",
+    "snyk": "1.235.0",
     "socket.io": "^4.7.2",
     "socket.io-client": "^4.7.2",
     "uuid": "^9.0.1"
